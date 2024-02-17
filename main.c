@@ -4,8 +4,10 @@
  * Created: 04.11.2023 16:02:22
  * Author : BH
  *
- * Using - https://github.com/TarkanAl-Kazily/Wii_Classic_Controller/blob/master/Wii_Classic_Controller.ino
+ * Using - https://github.com/gblargg/vusb-joystick
+ *       - https://github.com/TarkanAl-Kazily/Wii_Classic_Controller/blob/master/Wii_Classic_Controller.ino
  *       - https://www.instructables.com/USB-Wii-Classic-Controller/
+ *       - more
  */ 
 
 #include <stdint.h>
