@@ -192,7 +192,7 @@ uint8_t DataAvailable ( uint8_t *pArray, uint8_t yLength )
   
   for ( yIndex = 0; ( yIndex < yLength ) && ( bRetval == 0 ); yIndex++ )
   {
-	  if ( *(pArray+yIndex) != 0 ) bRetval = 1;
+    if ( *(pArray+yIndex) != 0 ) bRetval = 1;
   }
   
   return bRetval;
@@ -212,7 +212,7 @@ void ClassicControllerDecode( uint8_t *pBuffer, size_t len, ClassicController_t 
 {
   if ( len >= CLASSIC_BYTE_COUNT )
   {
-	pClassicController->LeftX  = ( pBuffer[0] & (64 - 1)) - 32; // 0 to 63
+    pClassicController->LeftX  = ( pBuffer[0] & (64 - 1)) - 32; // 0 to 63
     pClassicController->LeftY  = ( pBuffer[1] & (64 - 1)) - 32; // 0 to 63 -> -32 to 31
     // 
     // pClassicController->RightX = (((pBuffer[2] >> 7) & 1) + ((pBuffer[1] >> 6) & 3) * 2 + ((pBuffer[0] >> 6) & 3) * 8) - 16; // 0 to 31 -> -16 to 15
@@ -246,7 +246,7 @@ void ClassicControllerDecode( uint8_t *pBuffer, size_t len, ClassicController_t 
     pClassicController->ButtonZR     = (( pBuffer[5] & MASK_ZR   ) == 0);
     
     // For Testing
-	// if ( pClassicController->ButtonA ) main_bToggleLED = true; 
+    // if ( pClassicController->ButtonA ) main_bToggleLED = true; 
     // if ( pClassicController->ButtonB ) main_bToggleLED = false; 
   }
 }
@@ -328,45 +328,46 @@ static void ReadJoy( void )
     ClearTwiBuffer();
     
     twi_writeTo( CLASSIC_IDENT, main_ayTwiBuffer, 1, true );
-	_delay_us ( 500 ); // This delay is very important!
-	twi_readFrom( CLASSIC_IDENT, main_ayTwiBuffer, CLASSIC_BYTE_COUNT );
+    _delay_us ( 500 ); // This delay is very important!
+    twi_readFrom( CLASSIC_IDENT, main_ayTwiBuffer, CLASSIC_BYTE_COUNT );
 	  
-	bControllerDetected = DataAvailable( main_ayTwiBuffer, CLASSIC_BYTE_COUNT ); 
+    bControllerDetected = DataAvailable( main_ayTwiBuffer, CLASSIC_BYTE_COUNT ); 
     if ( bControllerDetected )
-	{
-	  ClassicControllerDecode( main_ayTwiBuffer, CLASSIC_BYTE_COUNT, &main_tClassicController );
-	  
+    {
+      ClassicControllerDecode( main_ayTwiBuffer, CLASSIC_BYTE_COUNT, &main_tClassicController );
+      	  
       // Process Controller Data
-	  HandleControllerInputs( &main_tClassicController );
-	}
+      HandleControllerInputs( &main_tClassicController );
+    }
   }
   else
   {
-	// Restart Controller (don't be too spammy)
-	
-	if ( main_lDelayCount >= RECONNECT_DELAY_VALUE )
-	{
+    // Restart Controller (don't be too spammy)
+    
+    if ( main_lDelayCount >= RECONNECT_DELAY_VALUE )
+    {
       main_ayTwiBuffer[0] = 0x00;
       twi_writeTo( CLASSIC_IDENT, main_ayTwiBuffer, 1, true );
-	  _delay_us(500); // the controller needs some time to process
+      _delay_us(500); // the controller needs some time to process
       twi_readFrom( CLASSIC_IDENT, main_ayTwiBuffer, CLASSIC_BYTE_COUNT );
-	  
+      
       bControllerDetected = DataAvailable( main_ayTwiBuffer, CLASSIC_BYTE_COUNT );
 	  
       if ( bControllerDetected )
-	  {
-	    ClassicControllerInit();
-		
-		// Prepare first read
-		twi_writeTo( CLASSIC_IDENT, main_ayTwiBuffer, 1, true );
-	  }
-	  main_lDelayCount = 0UL;
-	}
-	else
-	{
-	  main_lDelayCount++;
-	}
-  }	
+      {
+        ClassicControllerInit();
+        	
+        // Prepare first read
+        twi_writeTo( CLASSIC_IDENT, main_ayTwiBuffer, 1, true );
+        
+        main_lDelayCount = 0UL;
+      }
+      else
+      {
+        main_lDelayCount++;
+      }
+    }
+  }
   
   if ( bControllerDetected && !main_bToggleLED ) LED_ON;   
   else                                           LED_OFF;  
@@ -376,31 +377,31 @@ static void ReadJoy( void )
 // Necessary for V-USB usage
 uint8_t usbFunctionSetup( uint8_t data [8] )
 {
-	usbRequest_t const* rq = (usbRequest_t const*) data;
-
-	if ( (rq->bmRequestType & USBRQ_TYPE_MASK) != USBRQ_TYPE_CLASS )
-	return 0;
-	
-	switch ( rq->bRequest )
-	{
-		case USBRQ_HID_GET_REPORT: // HID joystick only has to handle this
-		usbMsgPtr = (usbMsgPtr_t) main_ayReportOut;
-		return sizeof main_ayReportOut;
-		
-		//case USBRQ_HID_SET_REPORT: // LEDs on joystick?
-		
-		default:
-		return 0;
-	}
+  usbRequest_t const* rq = (usbRequest_t const*) data;
+  
+  if ( (rq->bmRequestType & USBRQ_TYPE_MASK) != USBRQ_TYPE_CLASS )
+  return 0;
+  	
+  switch ( rq->bRequest )
+  {
+    case USBRQ_HID_GET_REPORT: // HID joystick only has to handle this
+    usbMsgPtr = (usbMsgPtr_t) main_ayReportOut;
+    return sizeof main_ayReportOut;
+    
+    //case USBRQ_HID_SET_REPORT: // LEDs on joystick?
+    	
+    default:
+    return 0;
+  }
 }
 
 void Init ( void )
 {
   DDRC  |= 1;            // Set LED as Output
   
-  I2cInit();		     // Initialize I2C driver
+  I2cInit();             // Initialize I2C driver
 
-  sei();			     // Enable Interrupts
+  sei();                 // Enable Interrupts
   
   _delay_ms(25);         // power up delay
   
@@ -416,33 +417,33 @@ void Init ( void )
 
 int main(void)
 {
-	Init();
-	 
-	// Initial Delay value
-	// without, USB device is not detected properly
-	static uint32_t lDelay = 0;
-	
-	for ( ;; )
-	{
-	  usbPoll();
-		
-	  // Don't bother reading joy if previous changes haven't gone out yet.
-	  // Forces delay after changes which serves to debounce controller as well.
-	  if ( usbInterruptIsReady() )
-	  {
-	    // Read Gamepad from I2C
-		if ( lDelay >= INITIAL_DELAY_VALUE ) ReadJoy();
-		else                                 lDelay++;
-		
-		// Memory Compare: Don't send update unless joystick changed
-		if ( memcmp( main_ayReportOut, main_ayReport, sizeof( main_ayReport ) ) )
-		{
-		  memcpy( main_ayReportOut, main_ayReport, sizeof( main_ayReport ) );
-		  usbSetInterrupt( main_ayReportOut, sizeof( main_ayReportOut ) );
-		}
-	  }
-	}
-	
-	return 0;
+  Init();
+  	 
+  // Initial Delay value
+  // without, USB device is not detected properly
+  static uint32_t lDelay = 0;
+  	
+  for ( ;; )
+  {
+    usbPoll();
+  	
+    // Don't bother reading joy if previous changes haven't gone out yet.
+    // Forces delay after changes which serves to debounce controller as well.
+    if ( usbInterruptIsReady() )
+    {
+      // Read Gamepad from I2C
+      if ( lDelay >= INITIAL_DELAY_VALUE ) ReadJoy();
+      else                                 lDelay++;
+      
+      // Memory Compare: Don't send update unless joystick changed
+      if ( memcmp( main_ayReportOut, main_ayReport, sizeof( main_ayReport ) ) )
+      {
+        memcpy( main_ayReportOut, main_ayReport, sizeof( main_ayReport ) );
+        usbSetInterrupt( main_ayReportOut, sizeof( main_ayReportOut ) );
+      }
+    }
+  }
+  	
+  return 0;
 }
 
